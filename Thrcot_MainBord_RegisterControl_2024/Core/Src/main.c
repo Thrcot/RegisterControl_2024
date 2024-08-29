@@ -1,60 +1,76 @@
 #include "stm32f4xx.h"
+#include "peripheral_init.h"
 
-void RCC_Init(void);
-void GPIO_Init(void);
-void USART1_Init(void);
+void delay_ms(unsigned int delay);
+void delay_us(unsigned int delay);
+
+void USART2_Transmit(uint8_t *data, int size);
+void USART2_Print(uint8_t *data);
 
 int main(void)
 {
 	RCC_Init();
-	GPIO_Init();
-
-	GPIOC -> ODR |= (1 << 13);
+	TIM14_Init();
+	GPIOA_Init();
+	GPIOB_Init();
+	GPIOC_Init();
+	GPIOD_Init();
+	USART2_Init();
 
 	while (1)
 	{
-		GPIOC -> ODR ^= (1 << 13);
-		GPIOC -> ODR ^= (1 << 15);
+		USART2_Print("Hello World.\n\r");
 
-		for (int i = 0; i < 1000000; i++);
+		delay_ms(1000);
 	}
 
 	return 0;
 }
 
-void RCC_Init(void)
+void delay_ms(unsigned int delay)
 {
-	RCC -> CFGR |= (5 << 10);
-	RCC -> CFGR |= (4 << 13);
+	TIM14 -> SR &= (~(1 << 0));
+	TIM14 -> PSC = 45000 - 1;
+	TIM14 -> CNT = 0;
+	TIM14 -> ARR = delay - 1;
+	TIM14 -> CR1 |= (1 << 0);
 
-	RCC -> PLLCFGR = 0;
-	RCC -> PLLCFGR |= (8 << 0);
-	RCC -> PLLCFGR |= (360 << 6);
-	RCC -> PLLCFGR |= (1 << 22);
-	RCC -> PLLCFGR |= (2 << 24);
-	RCC -> PLLCFGR |= (2 << 28);
+	while (!(TIM14 -> SR & (1 << 0)));
 
-	FLASH -> ACR |= (5 << 0);
-
-	RCC -> CR |= (1 << 16);
-	while (!(RCC -> CR & (1 << 17)));
-
-	RCC -> CR |= (1 << 24);
-	while (!(RCC -> CR & (1 << 25)));
-
-	RCC -> CFGR |= (2 << 0);
-	while (!(RCC -> CFGR & (2 << 0)));
+	TIM14 -> CR1 &= (~(1 << 0));
 }
 
-void GPIO_Init(void)
+void delay_us(unsigned int delay)
 {
-	RCC -> AHB1ENR |= (1 << 0);
-	RCC -> AHB1ENR |= (1 << 1);
-	RCC -> AHB1ENR |= (1 << 2);
-	RCC -> AHB1ENR |= (1 << 3);
+	TIM14 -> SR &= (~(1 << 0));
+	TIM14 -> PSC = 45 - 1;
+	TIM14 -> CNT = 0;
+	TIM14 -> ARR = delay - 1;
+	TIM14 -> CR1 |= (1 << 0);
 
-	GPIOA -> MODER = 0x1A680CAA;
-	GPIOB -> MODER = 0x002AAA8F;
-	GPIOC -> MODER = 0x46AAA3FF;
-	GPIOD -> MODER = 0x00000020;
+	while (!(TIM14 -> SR & (1 << 0)));
+
+	TIM14 -> CR1 &= (~(1 << 0));
+}
+
+void USART2_Transmit(uint8_t *data, int size)
+{
+	for (int i = 0; i < size; i++) {
+		while (!(USART2 -> SR & (1 << 7)));
+
+		USART2 -> DR = data[i];
+
+		while (!(USART2 -> SR & (1 << 6)));
+	}
+}
+
+void USART2_Print(uint8_t *data)
+{
+	for (int i = 0; data[i] != '\0'; i++) {
+		while (!(USART2 -> SR & (1 << 7)));
+
+		USART2 -> DR = data[i];
+
+		while (!(USART2 -> SR & (1 << 6)));
+	}
 }
