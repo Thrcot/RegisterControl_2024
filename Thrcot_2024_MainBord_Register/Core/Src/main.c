@@ -6,6 +6,10 @@ void delay_us(unsigned int delay);
 int main(void)
 {
 	RCC_Init();
+	GPIOA_Init();
+	GPIOB_Init();
+	GPIOC_Init();
+	GPIOD_Init();
 	TIM14_Init();
 
 	while (1)
