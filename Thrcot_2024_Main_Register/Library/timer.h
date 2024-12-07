@@ -5,11 +5,13 @@
  *      Author: neoki
  */
 
-#ifndef TIMER_H_
-#define TIMER_H_
+#ifndef TIMER_TIMER_H_
+#define TIMER_TIMER_H_
 
 #include <stdint.h>
 #include "stm32f4xx.h"
+
+extern uint32_t __delay_ms;
 
 static inline void SysTick_Init(void)
 {
@@ -42,4 +44,4 @@ static inline void delay_us(uint32_t us)
 	SysTick -> CTRL &= (~(1 << 16));
 }
 
-#endif /* TIMER_H_ */
+#endif /* TIMER_TIMER_H_ */
