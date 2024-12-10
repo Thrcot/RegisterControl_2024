@@ -5,10 +5,12 @@
  *      Author: neoki
  */
 
-#ifndef CLOCK_H_
-#define CLOCK_H_
+#ifndef SYSTEM_H_
+#define SYSTEM_H_
 
 #include "stm32f4xx.h"
+
+extern uint32_t __delay_ms;
 
 static inline void RCC_PLL_Init(void)
 {
@@ -37,4 +39,35 @@ static inline void RCC_PLL_Init(void)
 	while (!(RCC -> CFGR & (0b10 << 2)));
 }
 
-#endif /* CLOCK_H_ */
+static inline void SysTick_Init(void)
+{
+	SysTick -> CTRL |= (1 << 2);
+}
+
+static inline void delay_ms(uint32_t ms)
+{
+	SysTick -> LOAD = 180000 - 1;
+	SysTick -> VAL = 0;
+	SysTick -> CTRL |= (1 << 0);
+
+	for (uint32_t i = 0; i < ms; i++) {
+		while (!(SysTick -> CTRL & (1 << 16)));
+	}
+
+	SysTick -> CTRL &= (~(1 << 0));
+}
+
+static inline void delay_us(uint32_t us)
+{
+	SysTick -> LOAD = 180 - 1;
+	SysTick -> VAL = 0;
+	SysTick -> CTRL |= (1 << 0);
+
+	for (uint32_t i = 0; i < us; i++) {
+		while (!(SysTick -> CTRL & (1 << 16)));
+	}
+
+	SysTick -> CTRL &= (~(1 << 16));
+}
+
+#endif /* SYSTEM_H_ */

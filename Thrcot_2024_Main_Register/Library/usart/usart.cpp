@@ -91,3 +91,32 @@ bool USART::Transmit(uint8_t* tx_buf, uint32_t data_size, uint32_t timeout)
 
 	return true;
 }
+
+bool USART::Receive(uint8_t* rx_buf, uint32_t data_size, uint32_t timeout)
+{
+	__delay_ms = 0;
+	SysTick -> LOAD = 180000 - 1;
+	SysTick -> VAL = 0;
+	SysTick -> CTRL |= (1U << 1);
+	SysTick -> CTRL |= (1U << 0);
+
+	for (uint32_t i = 0; i < data_size; i++) {
+		while (!(channel -> SR & (1U << 5))) {
+			if (__delay_ms > timeout) {
+				SysTick -> CTRL &= (~(1U << 0));
+				SysTick -> CTRL &= (~(1U << 1));
+				__delay_ms = 0;
+
+				return false;
+			}
+		}
+
+		rx_buf[i] = (uint8_t)(channel -> DR & 0xFF);
+	}
+
+	SysTick -> CTRL &= (~(1U << 0));
+	SysTick -> CTRL &= (~(1U << 1));
+	__delay_ms = 0;
+
+	return true;
+}
