@@ -106,3 +106,17 @@ void GPIO_Pin_Mode_Set(PinNum_t __pinNum, IOMode_t __mode)
 	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> MODER &= (~(0b11U << (__pin * 2)));
 	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> MODER |= (__mode << (__pin * 2));
 }
+
+void GPIO_Pin_AF_Set(PinNum_t __pinNum, AFx_t __AFNum)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	if (__pin <= 7) {
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] &= (~(0b1111U << (__pin * 4)));
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] |= (__AFNum << (__pin * 4));
+	} else {
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] &= (~(0b1111U << ((__pin - 8) * 4)));
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] |= (__AFNum << ((__pin - 8) * 4));
+	}
+}

@@ -9,6 +9,8 @@
 
 USART::USART(USART_t usart_channel, uint32_t baudrate)
 {
+	uint32_t APBx_freq = 0;
+
 	switch (usart_channel) {
 		case USART_1:
 			RCC -> APB2ENR |= (1U << 4);
@@ -54,11 +56,27 @@ USART::USART(USART_t usart_channel, uint32_t baudrate)
 			break;
 	}
 
+	usart_ch = usart_channel;
+
 	channel -> BRR = APBx_freq / baudrate;
 
 	channel -> CR1 |= (1U << 2);
 	channel -> CR1 |= (1U << 3);
 	channel -> CR1 |= (1U << 13);
+}
+
+void USART::pinSet(PinNum_t __pinNum1, PinNum_t __pinNum2)
+{
+	GPIO_Pin_Mode_Set(__pinNum1, AF);
+	GPIO_Pin_Mode_Set(__pinNum2, AF);
+
+	if (usart_ch == USART_1 || usart_ch == USART_2 || usart_ch == USART_3) {
+		GPIO_Pin_AF_Set(__pinNum1, AF7);
+		GPIO_Pin_AF_Set(__pinNum2, AF7);
+	} else if (usart_ch == UART_4 || usart_ch == UART_5 || usart_ch == USART_6) {
+		GPIO_Pin_AF_Set(__pinNum1, AF8);
+		GPIO_Pin_AF_Set(__pinNum2, AF8);
+	}
 }
 
 bool USART::Transmit(uint8_t* tx_buf, uint32_t data_size, uint32_t timeout)

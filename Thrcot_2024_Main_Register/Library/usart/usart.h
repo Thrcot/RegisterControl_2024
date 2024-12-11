@@ -10,9 +10,10 @@
 
 #include "stm32f4xx.h"
 #include <system.h>
+#include <gpio/gpio.h>
 
 typedef enum {
-	USART_1		= 1,
+	USART_1,
 	USART_2,
 	USART_3,
 	UART_4,
@@ -23,12 +24,13 @@ typedef enum {
 class USART {
 	public:
 		USART(USART_t usart_channel, uint32_t baudrate);
+		void pinSet(PinNum_t __pinNum1, PinNum_t __pinNum2);
 		bool Transmit(uint8_t* tx_buf, uint32_t data_size, uint32_t timeout);
 		bool Receive(uint8_t* rx_buf, uint32_t data_size, uint32_t timeout);
 
 	private:
+		USART_t	usart_ch;
 		USART_TypeDef* channel;
-		uint32_t APBx_freq;
 };
 
 #endif /* UART_H_ */

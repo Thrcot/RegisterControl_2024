@@ -78,13 +78,82 @@ typedef enum {
 	ANALOG
 } IOMode_t;
 
+typedef enum {
+	AF0		= 0,
+	AF1,
+	AF2,
+	AF3,
+	AF4,
+	AF5,
+	AF6,
+	AF7,
+	AF8,
+	AF9,
+	AF10,
+	AF11,
+	AF12,
+	AF13,
+	AF14,
+	AF15
+} AFx_t;
+
 #define GPIOx_OFFSET	0x00000400
 #define GPIOx_BASE(x)	(AHB1PERIPH_BASE + (GPIOx_OFFSET * x))
 
 #define LOW				false
 #define HIGH			true
 
+/*GPIO init functiont*/
 void GPIO_Port_Mode_Set(PortNum_t __portNum, uint32_t __mode);
 void GPIO_Pin_Mode_Set(PinNum_t __pinNum, IOMode_t __mode);
+void GPIO_Pin_AF_Set(PinNum_t __pinNum, AFx_t __AFNum);
+
+/*GPIO output function*/
+static inline void GPIO_Port_Write(PortNum_t __portNum, uint16_t __state)
+{
+	((GPIO_TypeDef*)(GPIOx_BASE(__portNum))) -> ODR = __state;
+}
+
+static inline void GPIO_Pin_LOW(PinNum_t __pinNum)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> ODR &= (~(1U << __pin));
+}
+
+static inline void GPIO_Pin_HIGH(PinNum_t __pinNum)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> ODR |= (1U << __pin);
+}
+
+static inline void GPIO_Pin_Write(PinNum_t __pinNum, bool __state)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	if (__state == false) {
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> ODR &= (~(1U << __pin));
+	} else {
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> ODR |= (1U << __pin);
+	}
+}
+
+/*GPIO input function*/
+static inline uint16_t GPIO_Port_Read(PortNum_t __portNum)
+{
+	return (uint16_t)(((GPIO_TypeDef*)(GPIOx_BASE(__portNum))) -> IDR & 0xFFFF);
+}
+
+static inline bool GPIO_Pin_Read(PinNum_t __pinNum)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	return (bool)((((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> IDR & (1U << __pin) >> __pin));
+}
 
 #endif /* GPIO_GPIO_H_ */
