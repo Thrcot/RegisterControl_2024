@@ -116,7 +116,7 @@ void GPIO_Pin_AF_Set(PinNum_t __pinNum, AFx_t __AFNum)
 		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] &= (~(0b1111U << (__pin * 4)));
 		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] |= (__AFNum << (__pin * 4));
 	} else {
-		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] &= (~(0b1111U << ((__pin - 8) * 4)));
-		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[0] |= (__AFNum << ((__pin - 8) * 4));
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[1] &= (~(0b1111U << ((__pin - 8) * 4)));
+		((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> AFR[1] |= (__AFNum << ((__pin - 8) * 4));
 	}
 }
