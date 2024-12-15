@@ -110,6 +110,139 @@ bool USART::Transmit(uint8_t* tx_buf, uint32_t data_size, uint32_t timeout)
 	return true;
 }
 
+bool USART::Transmit(const char* tx_buf, uint32_t data_size, uint32_t timeout)
+{
+	__delay_ms = 0;
+	SysTick -> LOAD = 180000 - 1;
+	SysTick -> VAL = 0;
+	SysTick -> CTRL |= (1U << 1);
+	SysTick -> CTRL |= (1U << 0);
+
+	for (uint32_t i = 0; i < data_size; i++) {
+		while (!(channel -> SR & (1U << 7))) {
+			if (__delay_ms > timeout) {
+				SysTick -> CTRL &= (~(1U << 0));
+				SysTick -> CTRL &= (~(1U << 1));
+				__delay_ms = 0;
+
+				return false;
+			}
+		}
+
+		channel -> DR = (uint8_t)(tx_buf[i]);
+
+		while (!(channel -> SR & (1U << 6)));
+	}
+
+	SysTick -> CTRL &= (~(1U << 0));
+	SysTick -> CTRL &= (~(1U << 1));
+	__delay_ms = 0;
+
+	return true;
+}
+
+bool USART::Print(const char* __msg)
+{
+	unsigned long i = 0;
+
+	while (__msg[i] != '\0') {
+		i++;
+	}
+
+	return Transmit(__msg, i, 1000);
+}
+
+bool USART::Print(int8_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Print(uint8_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Print(int16_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Print(uint16_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Print(int32_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Print(uint32_t __num)
+{
+	char __buf[20] = {0};
+	NumToStr(__num, __buf);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(const char* __msg)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__msg);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(int8_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(uint8_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(int16_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(uint16_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(int32_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
+bool USART::Println(uint32_t __num)
+{
+	uint8_t __buf[5] = "\n\r";
+	Print(__num);
+	return Transmit(__buf, sizeof(__buf), 1000);
+}
+
 bool USART::Receive(uint8_t* rx_buf, uint32_t data_size, uint32_t timeout)
 {
 	__delay_ms = 0;

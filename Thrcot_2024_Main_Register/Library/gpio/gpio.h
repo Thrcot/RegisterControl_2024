@@ -79,6 +79,24 @@ typedef enum {
 } IOMode_t;
 
 typedef enum {
+	PUSH_PULL	= 0,
+	OPEN_DRAIN
+} OutType_t;
+
+typedef enum {
+	LOW_SPEED		= 0,
+	MEDIUM_SPEED,
+	FAST_SPEED,
+	HIGH_SPEED
+} OutSpeed_t;
+
+typedef enum {
+	FREE		= 0,
+	PULL_UP,
+	PULL_DOWN,
+} Pull_t;
+
+typedef enum {
 	AF0		= 0,
 	AF1,
 	AF2,
@@ -106,6 +124,9 @@ typedef enum {
 /*GPIO init functiont*/
 void GPIO_Port_Mode_Set(PortNum_t __portNum, uint32_t __mode);
 void GPIO_Pin_Mode_Set(PinNum_t __pinNum, IOMode_t __mode);
+void GPIO_Pin_OutType_Set(PinNum_t __pinNum, OutType_t __out_mode);
+void GPIO_Pin_OutSpeed_Set(PinNum_t __pinNum, OutSpeed_t __out_speed);
+void GPIO_Pin_Pull_Set(PinNum_t __pinNum, Pull_t __pull_state);
 void GPIO_Pin_AF_Set(PinNum_t __pinNum, AFx_t __AFNum);
 
 /*GPIO output function*/
@@ -153,7 +174,7 @@ static inline bool GPIO_Pin_Read(PinNum_t __pinNum)
 	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
 	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
 
-	return (bool)((((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> IDR & (1U << __pin) >> __pin));
+	return (bool)(((((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> IDR & (1U << __pin)) >> __pin));
 }
 
 #endif /* GPIO_GPIO_H_ */

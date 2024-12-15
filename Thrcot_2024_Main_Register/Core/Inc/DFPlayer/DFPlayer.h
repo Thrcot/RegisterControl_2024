@@ -8,7 +8,7 @@
 #ifndef INC_DFPLAYER_HAL_H_
 #define INC_DFPLAYER_HAL_H_
 
-#include <system.h>
+#include <system/system.h>
 #include <usart/usart.h>
 
 #define DFP_OK 1

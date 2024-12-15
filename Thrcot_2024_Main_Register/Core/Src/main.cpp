@@ -1,8 +1,10 @@
 #include "stm32f4xx.h"
-#include <system.h>
+#include <system/system.h>
 #include <gpio/gpio.h>
 #include <usart/usart.h>
+#include <i2c/i2c.h>
 #include <DFPlayer/DFPlayer.h>
+#include <SSD1306/ssd1306.h>
 
 #define DBG_LD1		PC13
 #define DBG_LD2		PC15
@@ -16,6 +18,8 @@ USART Line(USART_2, 115200);
 USART WiFi(USART_3, 115200);
 USART Camera(UART_5, 115200);
 USART DFPlayer(USART_6, 9600);
+
+I2C OLED_BMX(I2C_2, 400000, PB3, PB10);
 
 int main(void)
 {
@@ -36,12 +40,17 @@ int main(void)
 	GPIO_Pin_Mode_Set(SW_START, INPUT);
 
 	DFP_Init(&DFPlayer);
+	OLED_Init(&OLED_BMX);
+
+	OLED_Thrcot_Large_Logo_Display();
+	delay_ms(1500);
+	OLED_AllClear();
 
 	while (1)
 	{
-		uint8_t msg[10] = "Hello\n\r";
-
-		Camera.Transmit(msg, sizeof(msg), 1000);
+		Camera.Println((uint16_t)(I2C2 -> SR1));
+		Camera.Println((uint16_t)(I2C2 -> SR2));
+		Camera.Println("");
 		delay_ms(1000);
 	}
 

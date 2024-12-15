@@ -107,6 +107,33 @@ void GPIO_Pin_Mode_Set(PinNum_t __pinNum, IOMode_t __mode)
 	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> MODER |= (__mode << (__pin * 2));
 }
 
+void GPIO_Pin_OutType_Set(PinNum_t __pinNum, OutType_t __out_mode)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> OTYPER &= (~(1U << __pin));
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> OTYPER |= (__out_mode << __pin);
+}
+
+void GPIO_Pin_OutSpeed_Set(PinNum_t __pinNum, OutSpeed_t __out_speed)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> OSPEEDR &= (~(0b11U << (__pin * 2)));
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> OSPEEDR |= (__out_speed << (__pin * 2));
+}
+
+void GPIO_Pin_Pull_Set(PinNum_t __pinNum, Pull_t __pull_state)
+{
+	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;
+	uint8_t __pin  = (uint8_t)__pinNum & 0x0F;
+
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> PUPDR &= (~(0b11U << (__pin * 2)));
+	((GPIO_TypeDef*)(GPIOx_BASE(__port))) -> PUPDR |= (__pull_state << (__pin * 2));
+}
+
 void GPIO_Pin_AF_Set(PinNum_t __pinNum, AFx_t __AFNum)
 {
 	uint8_t __port = ((uint8_t)__pinNum & 0xF0) >> 4;

@@ -5,12 +5,30 @@
  *      Author: neoki
  */
 
-#ifndef SYSTEM_H_
-#define SYSTEM_H_
+#ifndef SYSTEM_SYSTEM_H_
+#define SYSTEM_SYSTEM_H_
 
 #include "stm32f4xx.h"
 
 extern uint32_t __delay_ms;
+
+int __pow(int num, int count);
+
+void __ToStr_8(int8_t num, char* str);
+void __ToStr_u8(uint8_t num, char* str);
+void __ToStr_16(int16_t num, char* str);
+void __ToStr_u16(uint16_t num, char* str);
+void __ToStr_32(int32_t num, char* str);
+void __ToStr_u32(uint32_t num, char* str);
+void __ToStr_64(int64_t num, char* str);
+void __ToStr_u64(uint64_t num, char* str);
+
+void NumToStr(int8_t num, char* str);
+void NumToStr(uint8_t num, char* str);
+void NumToStr(int16_t num, char* str);
+void NumToStr(uint16_t num, char* str);
+void NumToStr(int32_t num, char* str);
+void NumToStr(uint32_t num, char* str);
 
 static inline void RCC_PLL_Init(void)
 {
@@ -70,4 +88,4 @@ static inline void delay_us(uint32_t us)
 	SysTick -> CTRL &= (~(1 << 16));
 }
 
-#endif /* SYSTEM_H_ */
+#endif /* SYSTEM_SYSTEM_H_ */
